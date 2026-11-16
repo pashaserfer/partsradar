@@ -52,7 +52,8 @@
 </div>
 
 <script>
-    const API_URL = "https://amvera.tech";
+  const API_URL = "https://amvera.tech";
+
 
 
     async function runSearch(article) {
@@ -66,7 +67,7 @@
 
         try {
             const controller = new AbortController();
-            setTimeout(() => controller.abort(), 2000);
+            setTimeout(() => controller.abort(), 8000);
             const res = await fetch(`${API_URL}?article=${encodeURIComponent(cleanArt)}`, { signal: controller.signal });
             if (res.ok) {
                 const data = await res.json();
