@@ -3,31 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PartsRadar — Поиск автозапчастей</title>
+    <title>PartsRadar — Поиск автозапчастей и сравнение цен</title>
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #0f172a; padding: 16px; margin: 0; }
         .container { max-width: 820px; margin: 0 auto; }
-        header { text-align: center; padding: 20px 0; }
+        
+        /* Верхняя панель с выбором города */
+        .top-bar { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+        .city-btn { background: #fff; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #334155; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .city-btn:hover { border-color: #2563eb; color: #2563eb; }
+
+        header { text-align: center; padding: 10px 0 22px; }
         .logo { font-size: 28px; font-weight: 800; color: #2563eb; }
         .tagline { color: #64748b; font-size: 14px; margin-top: 4px; }
+        
         .search-card { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
         .search-form { display: flex; gap: 10px; }
-        .search-input { flex: 1; padding: 12px 16px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 10px; text-transform: uppercase; }
+        .search-input { flex: 1; padding: 12px 16px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 10px; text-transform: uppercase; outline: none; }
+        .search-input:focus { border-color: #2563eb; }
         .search-btn { padding: 12px 24px; font-size: 16px; font-weight: 600; color: #fff; background: #2563eb; border: none; border-radius: 10px; cursor: pointer; }
         .examples { margin-top: 10px; font-size: 13px; color: #64748b; }
         .chip { background: #f1f5f9; padding: 4px 10px; border-radius: 6px; color: #2563eb; cursor: pointer; margin-left: 6px; font-weight: 600; border: none; }
+        
         .status { margin-bottom: 12px; font-size: 13px; color: #64748b; }
         .badge-demo { background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 6px; font-weight: 600; }
         .badge-live { background: #dcfce7; color: #166534; padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+        
         .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .card.best { background: #ecfdf5; border-color: #10b981; }
         .price { font-size: 18px; font-weight: 800; }
         .btn-buy { display: inline-block; padding: 6px 14px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 8px; font-size: 13px; margin-top: 4px; }
         .ad-banner { margin-top: 24px; padding: 16px; background: #fff; border: 1px dashed #cbd5e1; border-radius: 12px; text-align: center; color: #64748b; font-size: 13px; }
+
+        /* Модальное окно выбора города */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+        .modal { background: #fff; border-radius: 16px; max-width: 400px; width: 100%; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-weight: 700; font-size: 17px; }
+        .close-modal { background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b; }
+        .city-input { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; margin-bottom: 12px; box-sizing: border-box; }
+        .cities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+        .city-option { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 8px; font-size: 13px; cursor: pointer; text-align: left; }
+        .city-option:hover { border-color: #2563eb; color: #2563eb; }
+        .save-city-btn { width: 100%; padding: 10px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
 <div class="container">
+    <div class="top-bar">
+        <button type="button" class="city-btn" id="openCityModal">
+            📍 <span id="currentCityLabel">Определяем город...</span> ▾
+        </button>
+    </div>
+
     <header>
         <div class="logo">📡 PartsRadar</div>
         <div class="tagline">Находим самые выгодные цены и сроки доставки автозапчастей по артикулу</div>
@@ -51,16 +78,71 @@
     <div class="ad-banner">Место для рекламного блока (Автосервисы, ОСАГО или РСЯ)</div>
 </div>
 
+<!-- Окно выбора города -->
+<div class="modal-overlay" id="cityModal">
+    <div class="modal">
+        <div class="modal-header">
+            <span>Ваш город доставки</span>
+            <button type="button" class="close-modal" id="closeCityModal">✕</button>
+        </div>
+        <input type="text" id="customCityInput" class="city-input" placeholder="Введите название города...">
+        <div class="cities-grid">
+            <button type="button" class="city-option" data-city="Москва">Москва</button>
+            <button type="button" class="city-option" data-city="Санкт-Петербург">Санкт-Петербург</button>
+            <button type="button" class="city-option" data-city="Мурманск">Мурманск</button>
+            <button type="button" class="city-option" data-city="Екатеринбург">Екатеринбург</button>
+            <button type="button" class="city-option" data-city="Новосибирск">Новосибирск</button>
+            <button type="button" class="city-option" data-city="Казань">Казань</button>
+            <button type="button" class="city-option" data-city="Краснодар">Краснодар</button>
+            <button type="button" class="city-option" data-city="Нижний Новгород">Нижний Новгород</button>
+        </div>
+        <button type="button" class="save-city-btn" id="saveCustomCity">Применить город</button>
+    </div>
+</div>
+
 <script>
- const API_URL = "https://partsradar-serfer.msk1.amvera.tech/api/search";
+    const API_URL = "https://amvera.tech";
+    let selectedCity = localStorage.getItem('partsradar_city') || "";
 
+    // Автоопределение города при первом визите
+    async function initCity() {
+        if (selectedCity) {
+            updateCityUI(selectedCity);
+            runSearch(document.getElementById('artInput').value);
+            return;
+        }
+        try {
+            const res = await fetch('https://ipwho.is');
+            const data = await res.json();
+            selectedCity = (data && data.success && data.city) ? data.city : "Москва";
+        } catch (e) {
+            selectedCity = "Москва";
+        }
+        localStorage.setItem('partsradar_city', selectedCity);
+        updateCityUI(selectedCity);
+        runSearch(document.getElementById('artInput').value);
+    }
 
+    function updateCityUI(city) {
+        document.getElementById('currentCityLabel').textContent = city;
+        document.getElementById('customCityInput').value = city;
+    }
+
+    function setCity(newCity) {
+        const cleanCity = newCity.trim();
+        if (!cleanCity) return;
+        selectedCity = cleanCity;
+        localStorage.setItem('partsradar_city', selectedCity);
+        updateCityUI(selectedCity);
+        document.getElementById('cityModal').style.display = 'none';
+        runSearch(document.getElementById('artInput').value);
+    }
 
     async function runSearch(article) {
         const cleanArt = article.trim().toUpperCase();
         if (!cleanArt) return;
         document.getElementById('artInput').value = cleanArt;
-        document.getElementById('status').innerHTML = "Сканируем магазины...";
+        document.getElementById('status').innerHTML = `Сканируем магазины для г. ${selectedCity}...`;
 
         let offers = [];
         let isLive = false;
@@ -68,7 +150,8 @@
         try {
             const controller = new AbortController();
             setTimeout(() => controller.abort(), 8000);
-            const res = await fetch(`${API_URL}?article=${encodeURIComponent(cleanArt)}`, { signal: controller.signal });
+            const url = `${API_URL}?article=${encodeURIComponent(cleanArt)}&city=${encodeURIComponent(selectedCity)}`;
+            const res = await fetch(url, { signal: controller.signal });
             if (res.ok) {
                 const data = await res.json();
                 offers = data.offers || [];
@@ -77,38 +160,13 @@
         } catch (e) {}
 
         if (!isLive || offers.length === 0) {
+            const extraDays = (selectedCity === "Москва" || selectedCity === "Санкт-Петербург") ? 0 : 2;
             offers = [
-                { store: "Emex", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 615, days: 3, url: `https://emex.ru{cleanArt}` },
-                { store: "Autodoc", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 640, days: 1, url: `https://autodoc.ru{cleanArt}` },
-                { store: "Exist", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 690, days: 2, url: `https://exist.ru{cleanArt}` },
-                { store: "Ozon", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 780, days: 1, url: `https://ozon.ru{cleanArt}` }
+                { store: "Emex", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 615, days: 2 + extraDays, url: `https://emex.ru{cleanArt}` },
+                { store: "Autodoc", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 640, days: 1 + extraDays, url: `https://autodoc.ru{cleanArt}` },
+                { store: "Exist", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 690, days: 2 + extraDays, url: `https://exist.ru{cleanArt}` },
+                { store: "Ozon", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 780, days: 1 + extraDays, url: `https://ozon.ru{cleanArt}` }
             ];
         }
 
         const minPrice = Math.min(...offers.map(o => o.price));
-        document.getElementById('status').innerHTML = isLive 
-            ? `Найдено: <b>${offers.length}</b> <span class="badge-live">Подключено к Python-серверу</span>`
-            : `Найдено: <b>${offers.length}</b> <span class="badge-demo">Демо-режим (сервер не запущен)</span>`;
-
-        document.getElementById('results').innerHTML = offers.map(o => `
-            <div class="card ${o.price === minPrice ? 'best' : ''}">
-                <div>
-                    <b>${o.store}</b> • ${o.brand} (${o.article})<br>
-                    <small style="color:#64748b">${o.name} • Доставка: ${o.days} дн.</small>
-                </div>
-                <div style="text-align:right">
-                    <div class="price">${o.price} ₽</div>
-                    <a href="${o.url}" target="_blank" class="btn-buy">Перейти</a>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    document.getElementById('searchBtn').addEventListener('click', () => runSearch(document.getElementById('artInput').value));
-    document.getElementById('artInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') runSearch(e.target.value); });
-    document.querySelectorAll('.chip').forEach(btn => btn.addEventListener('click', () => runSearch(btn.dataset.art)));
-
-    runSearch('OC90');
-</script>
-</body>
-</html>
