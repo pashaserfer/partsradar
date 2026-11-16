@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PartsRadar — Поиск автозапчастей и сравнение цен</title>
-    <script src="https://telegram.org" defer></script>
+    <script src="https://telegram.org" async></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -18,304 +18,48 @@
             --best-border: #10b981;
             --best-text: #047857;
         }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            line-height: 1.5;
-            padding: 16px;
-        }
-
-        .container {
-            max-width: 820px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            padding: 24px 0 28px;
-        }
-
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
-        }
-
-        .logo-icon {
-            width: 38px;
-            height: 38px;
-            background: var(--primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .tagline {
-            color: var(--text-muted);
-            font-size: 15px;
-            margin-top: 6px;
-        }
-
-        .search-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-            border: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-
-        .search-form {
-            display: flex;
-            gap: 10px;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 14px 16px;
-            font-size: 16px;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            outline: none;
-            text-transform: uppercase;
-            transition: border-color 0.2s;
-        }
-
-        .search-input:focus {
-            border-color: var(--primary);
-        }
-
-        .search-btn {
-            padding: 14px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #ffffff;
-            background: var(--primary);
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-            white-space: nowrap;
-        }
-
-        .search-btn:hover {
-            background: var(--primary-hover);
-        }
-
-        .examples {
-            margin-top: 10px;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .example-chip {
-            display: inline-block;
-            background: #f1f5f9;
-            padding: 2px 8px;
-            border-radius: 6px;
-            color: var(--primary);
-            cursor: pointer;
-            margin-left: 4px;
-            font-weight: 500;
-        }
-
-        .example-chip:hover {
-            background: #e2e8f0;
-        }
-
-        .toolbar {
-            display: none;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .status-badge {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .demo-warning {
-            background: #fef3c7;
-            color: #92400e;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .sort-controls {
-            display: flex;
-            gap: 8px;
-        }
-
-        .sort-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            color: var(--text-main);
-        }
-
-        .sort-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .results-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .offer-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            display: grid;
-            grid-template-columns: 1.4fr 1.6fr 1fr auto;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .offer-card.best-offer {
-            background: var(--best-bg);
-            border-color: var(--best-border);
-        }
-
-        .store-name {
-            font-weight: 700;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .best-tag {
-            font-size: 11px;
-            background: var(--best-border);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-
-        .part-info {
-            font-size: 14px;
-        }
-
-        .part-brand {
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
-        .part-title {
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        .delivery-info {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .price-action {
-            text-align: right;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 6px;
-        }
-
-        .price {
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        .best-offer .price {
-            color: var(--best-text);
-        }
-
-        .buy-link {
-            display: inline-block;
-            padding: 6px 14px;
-            background: #f1f5f9;
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            border-radius: 8px;
-        }
-
-        .buy-link:hover {
-            background: #e2e8f0;
-        }
-
-        .best-offer .buy-link {
-            background: var(--best-border);
-            color: white;
-        }
-
-        .ad-banner {
-            margin-top: 28px;
-            padding: 16px;
-            background: #ffffff;
-            border: 1px dashed #cbd5e1;
-            border-radius: 12px;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        .loader {
-            display: none;
-            text-align: center;
-            padding: 30px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); line-height: 1.5; padding: 16px; }
+        .container { max-width: 820px; margin: 0 auto; }
+        header { text-align: center; padding: 24px 0 28px; }
+        .logo { display: inline-flex; align-items: center; gap: 10px; font-size: 28px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+        .logo-icon { width: 38px; height: 38px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; }
+        .tagline { color: var(--text-muted); font-size: 15px; margin-top: 6px; }
+        .search-card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05); border: 1px solid var(--border); margin-bottom: 20px; }
+        .search-form { display: flex; gap: 10px; }
+        .search-input { flex: 1; padding: 14px 16px; font-size: 16px; border: 2px solid var(--border); border-radius: 12px; outline: none; text-transform: uppercase; }
+        .search-input:focus { border-color: var(--primary); }
+        .search-btn { padding: 14px 24px; font-size: 16px; font-weight: 600; color: #fff; background: var(--primary); border: none; border-radius: 12px; cursor: pointer; }
+        .search-btn:hover { background: var(--primary-hover); }
+        .examples { margin-top: 10px; font-size: 13px; color: var(--text-muted); }
+        .example-chip { display: inline-block; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; color: var(--primary); cursor: pointer; margin-left: 4px; font-weight: 500; }
+        .toolbar { display: none; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .status-badge { font-size: 13px; color: var(--text-muted); }
+        .demo-warning { background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+        .live-badge { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+        .sort-controls { display: flex; gap: 8px; }
+        .sort-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+        .sort-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .results-list { display: flex; flex-direction: column; gap: 10px; }
+        .offer-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: grid; grid-template-columns: 1.4fr 1.6fr 1fr auto; align-items: center; gap: 12px; }
+        .offer-card.best-offer { background: var(--best-bg); border-color: var(--best-border); }
+        .store-name { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 6px; }
+        .best-tag { font-size: 11px; background: var(--best-border); color: white; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .part-brand { font-weight: 600; font-size: 14px; }
+        .part-title { color: var(--text-muted); font-size: 13px; }
+        .delivery-info { font-size: 13px; color: var(--text-muted); }
+        .price-action { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+        .price { font-size: 18px; font-weight: 800; }
+        .best-offer .price { color: var(--best-text); }
+        .buy-link { display: inline-block; padding: 6px 14px; background: #f1f5f9; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 600; border-radius: 8px; }
+        .best-offer .buy-link { background: var(--best-border); color: white; }
+        .ad-banner { margin-top: 28px; padding: 16px; background: #fff; border: 1px dashed #cbd5e1; border-radius: 12px; text-align: center; color: var(--text-muted); font-size: 13px; }
+        .loader { display: none; text-align: center; padding: 20px; color: var(--text-muted); font-weight: 500; }
         @media (max-width: 640px) {
-            .search-form {
-                flex-direction: column;
-            }
-            .offer-card {
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-            }
-            .part-info {
-                grid-column: 1 / -1;
-            }
-            .price-action {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                grid-column: 1 / -1;
-                border-top: 1px solid var(--border);
-                padding-top: 10px;
-                margin-top: 4px;
-            }
+            .search-form { flex-direction: column; }
+            .offer-card { grid-template-columns: 1fr 1fr; }
+            .part-info, .price-action { grid-column: 1 / -1; }
+            .price-action { flex-direction: row; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 10px; }
         }
     </style>
 </head>
@@ -325,7 +69,7 @@
     <header>
         <div class="logo">
             <div class="logo-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <circle cx="12" cy="12" r="9"></circle>
                     <circle cx="12" cy="12" r="4"></circle>
                     <line x1="12" y1="12" x2="18.36" y2="5.64"></line>
@@ -337,16 +81,10 @@
     </header>
 
     <div class="search-card">
-        <form class="search-form" id="searchForm">
-            <input 
-                type="text" 
-                id="articleInput" 
-                class="search-input" 
-                placeholder="Введите артикул (например, OC90 или 15208AA100)" 
-                required
-            >
-            <button type="submit" class="search-btn">Найти цены</button>
-        </form>
+        <div class="search-form">
+            <input type="text" id="articleInput" class="search-input" placeholder="Введите артикул (например, OC90)">
+            <button type="button" class="search-btn" onclick="handleSearch()">Найти цены</button>
+        </div>
         <div class="examples">
             Примеры для проверки: 
             <span class="example-chip" onclick="quickSearch('OC90')">OC90</span>
@@ -355,10 +93,10 @@
         </div>
     </div>
 
-    <div class="loader" id="loader">Сканируем магазины и маркетплейсы...</div>
+    <div class="loader" id="loader">Сканируем магазины...</div>
 
     <div class="toolbar" id="toolbar">
-        <div class="status-badge" id="statusText">Найдено предложений: 0</div>
+        <div class="status-badge" id="statusText"></div>
         <div class="sort-controls">
             <button class="sort-btn active" id="sortPriceBtn" onclick="sortOffers('price')">Сначала дешевле</button>
             <button class="sort-btn" id="sortDaysBtn" onclick="sortOffers('days')">Быстрее доставка</button>
@@ -367,4 +105,76 @@
 
     <div class="results-list" id="resultsList"></div>
 
-    <div class="ad-banner" id="yandex_rtb_placeholder">
+    <div class="ad-banner">Место для рекламного блока (Автосервисы, ОСАГО или РСЯ)</div>
+</div>
+
+<script>
+    const API_URL = "http://127.0.0";
+    let currentOffers = [];
+
+    document.getElementById('articleInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') handleSearch();
+    });
+
+    function quickSearch(article) {
+        document.getElementById('articleInput').value = article;
+        performSearch(article);
+    }
+
+    function handleSearch() {
+        const article = document.getElementById('articleInput').value.trim();
+        if (article) performSearch(article);
+    }
+
+    async function performSearch(article) {
+        const loader = document.getElementById('loader');
+        const resultsList = document.getElementById('resultsList');
+        const toolbar = document.getElementById('toolbar');
+
+        loader.style.display = 'block';
+        resultsList.innerHTML = '';
+        toolbar.style.display = 'none';
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+        try {
+            const response = await fetch(`${API_URL}?article=${encodeURIComponent(article)}`, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error('Ошибка сервера');
+            const data = await response.json();
+            currentOffers = data.offers || [];
+            renderResults(currentOffers, false);
+        } catch (error) {
+            clearTimeout(timeoutId);
+            currentOffers = getDemoOffers(article);
+            renderResults(currentOffers, true);
+        } finally {
+            loader.style.display = 'none';
+        }
+    }
+
+    function renderResults(offers, isDemo) {
+        const resultsList = document.getElementById('resultsList');
+        const toolbar = document.getElementById('toolbar');
+        const statusText = document.getElementById('statusText');
+
+        resultsList.innerHTML = '';
+        toolbar.style.display = 'flex';
+
+        statusText.innerHTML = isDemo 
+            ? `Найдено: ${offers.length} <span class="demo-warning">Демо-режим (сервер не запущен)</span>` 
+            : `Найдено: <b>${offers.length}</b> <span class="live-badge">Подключено к Python-серверу</span>`;
+
+        const minPrice = Math.min(...offers.map(o => o.price));
+
+        offers.forEach(offer => {
+            const isBest = offer.price === minPrice;
+            const card = document.createElement('div');
+            card.className = `offer-card ${isBest ? 'best-offer' : ''}`;
+            const deliveryLabel = offer.days === 0 ? 'Сегодня' : (offer.days === 1 ? 'Завтра' : `${offer.days} дн.`);
+
+            card.innerHTML = `
+                <div class="store-name">${offer.store} ${isBest ? '<span class="best-tag">Лучшая цена</span>' : ''}</div>
+                <div class="part-info">
+                    <div class="part-brand">${offer.brand} • ${offer.article}</div>
