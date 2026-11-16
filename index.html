@@ -7,16 +7,15 @@
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #0f172a; padding: 16px; margin: 0; }
         .container { max-width: 820px; margin: 0 auto; }
-        .top-bar { display: flex; justify-content: flex-end; margin-bottom: 8px; }
-        .city-btn { background: #fff; border: 1px solid #cbd5e1; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #1e293b; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-        .city-btn:hover { border-color: #2563eb; color: #2563eb; }
-        header { text-align: center; padding: 10px 0 22px; }
+        .top-bar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .city-select { background: #fff; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #1e293b; cursor: pointer; outline: none; }
+        .city-select:hover { border-color: #2563eb; }
+        header { text-align: center; padding: 8px 0 22px; }
         .logo { font-size: 28px; font-weight: 800; color: #2563eb; }
         .tagline { color: #64748b; font-size: 14px; margin-top: 4px; }
         .search-card { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
         .search-form { display: flex; gap: 10px; }
         .search-input { flex: 1; padding: 12px 16px; font-size: 16px; border: 2px solid #e2e8f0; border-radius: 10px; text-transform: uppercase; outline: none; }
-        .search-input:focus { border-color: #2563eb; }
         .search-btn { padding: 12px 24px; font-size: 16px; font-weight: 600; color: #fff; background: #2563eb; border: none; border-radius: 10px; cursor: pointer; }
         .examples { margin-top: 10px; font-size: 13px; color: #64748b; }
         .chip { background: #f1f5f9; padding: 4px 10px; border-radius: 6px; color: #2563eb; cursor: pointer; margin-left: 6px; font-weight: 600; border: none; }
@@ -28,21 +27,22 @@
         .price { font-size: 18px; font-weight: 800; }
         .btn-buy { display: inline-block; padding: 6px 14px; background: #2563eb; color: #fff; text-decoration: none; border-radius: 8px; font-size: 13px; margin-top: 4px; }
         .ad-banner { margin-top: 24px; padding: 16px; background: #fff; border: 1px dashed #cbd5e1; border-radius: 12px; text-align: center; color: #64748b; font-size: 13px; }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
-        .modal { background: #fff; border-radius: 16px; max-width: 400px; width: 100%; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-weight: 700; font-size: 17px; }
-        .close-modal { background: none; border: none; font-size: 20px; cursor: pointer; color: #64748b; }
-        .city-input { width: 100%; padding: 10px 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px; margin-bottom: 12px; box-sizing: border-box; }
-        .cities-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
-        .city-option { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px; border-radius: 8px; font-size: 13px; cursor: pointer; text-align: left; }
-        .city-option:hover { border-color: #2563eb; color: #2563eb; }
-        .save-city-btn { width: 100%; padding: 10px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="top-bar">
-        <button type="button" class="city-btn" id="openCityModal">📍 <span id="currentCityLabel">Москва</span> ▾</button>
+        <span style="font-size:13px; color:#64748b;">📍 Город:</span>
+        <select id="citySelect" class="city-select" onchange="changeCity(this.value)">
+            <option value="Мурманск">Мурманск</option>
+            <option value="Москва">Москва</option>
+            <option value="Санкт-Петербург">Санкт-Петербург</option>
+            <option value="Екатеринбург">Екатеринбург</option>
+            <option value="Новосибирск">Новосибирск</option>
+            <option value="Казань">Казань</option>
+            <option value="Краснодар">Краснодар</option>
+            <option value="Нижний Новгород">Нижний Новгород</option>
+        </select>
     </div>
 
     <header>
@@ -53,13 +53,13 @@
     <div class="search-card">
         <div class="search-form">
             <input type="text" id="artInput" class="search-input" value="OC90" placeholder="Введите артикул">
-            <button type="button" id="searchBtn" class="search-btn">Найти цены</button>
+            <button type="button" class="search-btn" onclick="runSearch()">Найти цены</button>
         </div>
         <div class="examples">
             Примеры для проверки:
-            <button type="button" class="chip" data-art="OC90">OC90</button>
-            <button type="button" class="chip" data-art="2630035505">2630035505</button>
-            <button type="button" class="chip" data-art="4806009030">4806009030</button>
+            <button type="button" class="chip" onclick="quickArt('OC90')">OC90</button>
+            <button type="button" class="chip" onclick="quickArt('2630035505')">2630035505</button>
+            <button type="button" class="chip" onclick="quickArt('4806009030')">4806009030</button>
         </div>
     </div>
 
@@ -68,69 +68,34 @@
     <div class="ad-banner">Место для рекламного блока (Автосервисы, ОСАГО или РСЯ)</div>
 </div>
 
-<div class="modal-overlay" id="cityModal">
-    <div class="modal">
-        <div class="modal-header">
-            <span>Ваш город доставки</span>
-            <button type="button" class="close-modal" id="closeCityModal">✕</button>
-        </div>
-        <input type="text" id="customCityInput" class="city-input" placeholder="Введите название города...">
-        <div class="cities-grid">
-            <button type="button" class="city-option" data-city="Москва">Москва</button>
-            <button type="button" class="city-option" data-city="Санкт-Петербург">Санкт-Петербург</button>
-            <button type="button" class="city-option" data-city="Мурманск">Мурманск</button>
-            <button type="button" class="city-option" data-city="Екатеринбург">Екатеринбург</button>
-            <button type="button" class="city-option" data-city="Новосибирск">Новосибирск</button>
-            <button type="button" class="city-option" data-city="Казань">Казань</button>
-            <button type="button" class="city-option" data-city="Краснодар">Краснодар</button>
-            <button type="button" class="city-option" data-city="Нижний Новгород">Нижний Новгород</button>
-        </div>
-        <button type="button" class="save-city-btn" id="saveCustomCity">Применить город</button>
-    </div>
-</div>
-
 <script>
     const API_URL = "https://amvera.tech";
-    let selectedCity = localStorage.getItem('partsradar_city') || "Москва";
+    let currentCity = localStorage.getItem('pr_city_v2') || "Мурманск";
 
-    function updateCityUI(city) {
-        document.getElementById('currentCityLabel').textContent = city;
-        document.getElementById('customCityInput').value = city;
+    function changeCity(city) {
+        currentCity = city;
+        localStorage.setItem('pr_city_v2', city);
+        runSearch();
     }
 
-    function setCity(newCity) {
-        const cleanCity = newCity.trim();
-        if (!cleanCity) return;
-        selectedCity = cleanCity;
-        localStorage.setItem('partsradar_city', selectedCity);
-        updateCityUI(selectedCity);
-        document.getElementById('cityModal').style.display = 'none';
-        runSearch(document.getElementById('artInput').value);
+    function quickArt(art) {
+        document.getElementById('artInput').value = art;
+        runSearch();
     }
 
-    // Сначала подключаем все кнопки, чтобы они работали мгновенно
-    document.getElementById('openCityModal').onclick = () => { document.getElementById('cityModal').style.display = 'flex'; };
-    document.getElementById('closeCityModal').onclick = () => { document.getElementById('cityModal').style.display = 'none'; };
-    document.getElementById('saveCustomCity').onclick = () => setCity(document.getElementById('customCityInput').value);
-    document.querySelectorAll('.city-option').forEach(btn => { btn.onclick = () => setCity(btn.dataset.city); });
-    document.getElementById('searchBtn').onclick = () => runSearch(document.getElementById('artInput').value);
-    document.getElementById('artInput').onkeypress = (e) => { if (e.key === 'Enter') runSearch(e.target.value); };
-    document.querySelectorAll('.chip').forEach(btn => { btn.onclick = () => runSearch(btn.dataset.art); });
-
-    async function runSearch(article) {
-        const cleanArt = article.trim().toUpperCase();
+    async function runSearch() {
+        const cleanArt = document.getElementById('artInput').value.trim().toUpperCase();
         if (!cleanArt) return;
         document.getElementById('artInput').value = cleanArt;
-        document.getElementById('status').innerHTML = `Сканируем магазины для г. ${selectedCity}...`;
+        document.getElementById('status').innerHTML = `Сканируем магазины для г. ${currentCity}...`;
 
         let offers = [];
         let isLive = false;
 
         try {
-            const controller = new AbortController();
-            setTimeout(() => controller.abort(), 8000);
-            const url = `${API_URL}?article=${encodeURIComponent(cleanArt)}&city=${encodeURIComponent(selectedCity)}`;
-            const res = await fetch(url, { signal: controller.signal });
+            const ctrl = new AbortController();
+            setTimeout(() => ctrl.abort(), 8000);
+            const res = await fetch(`${API_URL}?article=${encodeURIComponent(cleanArt)}&city=${encodeURIComponent(currentCity)}`, { signal: ctrl.signal });
             if (res.ok) {
                 const data = await res.json();
                 offers = data.offers || [];
@@ -139,13 +104,58 @@
         } catch (e) {}
 
         if (!isLive || offers.length === 0) {
-            const extraDays = (selectedCity === "Москва" || selectedCity === "Санкт-Петербург") ? 0 : 2;
+            const extra = (currentCity === "Москва" || currentCity === "Санкт-Петербург") ? 0 : 2;
             offers = [
-                { store: "Emex", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 615, days: 2 + extraDays, url: `https://emex.ru{cleanArt}` },
-                { store: "Autodoc", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 640, days: 1 + extraDays, url: `https://autodoc.ru{cleanArt}` },
-                { store: "Exist", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 690, days: 2 + extraDays, url: `https://exist.ru{cleanArt}` },
-                { store: "Ozon", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 780, days: 1 + extraDays, url: `https://ozon.ru{cleanArt}` }
+                { store: "Emex", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 615, days: 2 + extra, url: `https://emex.ru{cleanArt}` },
+                { store: "Autodoc", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 640, days: 1 + extra, url: `https://autodoc.ru{cleanArt}` },
+                { store: "Exist", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 690, days: 2 + extra, url: `https://exist.ru{cleanArt}` },
+                { store: "Ozon", brand: "MAHLE / KNECHT", article: cleanArt, name: "Фильтр масляный", price: 780, days: 1 + extra, url: `https://ozon.ru{cleanArt}` }
             ];
         }
 
         const minPrice = Math.min(...offers.map(o => o.price));
+        document.getElementById('status').innerHTML = isLive 
+            ? `Найдено в г. <b>${currentCity}</b>: <b>${offers.length}</b> <span class="badge-live">Подключено к Python-серверу</span>`
+            : `Найдено в г. <b>${currentCity}</b>: <b>${offers.length}</b> <span class="badge-demo">Демо-режим</span>`;
+
+        document.getElementById('results').innerHTML = offers.map(o => `
+            <div class="card ${o.price === minPrice ? 'best' : ''}">
+                <div>
+                    <b>${o.store}</b> • ${o.brand} (${o.article})<br>
+                    <small style="color:#64748b">${o.name} • Доставка в г. ${currentCity}: <b>${o.days} дн.</b></small>
+                </div>
+                <div style="text-align:right">
+                    <div class="price">${o.price} ₽</div>
+                    <a href="${o.url}" target="_blank" class="btn-buy">Перейти</a>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function init() {
+        const sel = document.getElementById('citySelect');
+        if (!localStorage.getItem('pr_city_v2')) {
+            try {
+                const ctrl = new AbortController();
+                setTimeout(() => ctrl.abort(), 2000);
+                const res = await fetch('https://sypexgeo.net', { signal: ctrl.signal });
+                const data = await res.json();
+                if (data && data.city && data.city.name_ru) {
+                    const detected = data.city.name_ru;
+                    if (![...sel.options].some(o => o.value === detected)) {
+                        sel.add(new Option(detected, detected));
+                    }
+                    currentCity = detected;
+                    localStorage.setItem('pr_city_v2', detected);
+                }
+            } catch (e) {}
+        }
+        sel.value = currentCity;
+        runSearch();
+    }
+
+    document.getElementById('artInput').addEventListener('keypress', e => { if (e.key === 'Enter') runSearch(); });
+    init();
+</script>
+</body>
+</html>
