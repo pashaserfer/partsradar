@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PartsRadar — Поиск автозапчастей и сравнение цен</title>
-    <script src="https://telegram.org" async></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -178,3 +177,4 @@
                 <div class="store-name">${offer.store} ${isBest ? '<span class="best-tag">Лучшая цена</span>' : ''}</div>
                 <div class="part-info">
                     <div class="part-brand">${offer.brand} • ${offer.article}</div>
+                    <div class="part-title">${offer.name}</div>
