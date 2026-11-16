@@ -3,233 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Поиск автозапчастей по артикулу</title>
+    <title>PartsRadar — Поиск автозапчастей и сравнение цен</title>
+    <script src="https://telegram.org"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #f4f6f9;
-            color: #1e293b;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --best-bg: #ecfdf5;
+            --best-border: #10b981;
+            --best-text: #047857;
         }
-        .container {
-            max-width: 700px;
-            width: 100%;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+
+        * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
-        h1 {
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        header {
             text-align: center;
-            color: #0f172a;
-            font-size: 24px;
-            margin-top: 0;
+            padding: 24px 0 28px;
         }
-        .subtitle {
-            text-align: center;
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
-        .search-box {
-            display: flex;
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
             gap: 10px;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .tagline {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-top: 6px;
+        }
+
+        .search-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+            border: 1px solid var(--border);
             margin-bottom: 20px;
         }
-        input {
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
             flex: 1;
             padding: 14px 16px;
             font-size: 16px;
-            border: 2px solid #cbd5e1;
-            border-radius: 10px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
             outline: none;
             text-transform: uppercase;
+            transition: border-color 0.2s;
         }
-        input:focus {
-            border-color: #1d4ed8;
+
+        .search-input:focus {
+            border-color: var(--primary);
         }
-        button.primary {
-            background-color: #1d4ed8;
-            color: white;
-            border: none;
+
+        .search-btn {
             padding: 14px 24px;
             font-size: 16px;
             font-weight: 600;
-            border-radius: 10px;
+            color: #ffffff;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
             cursor: pointer;
             transition: background 0.2s;
+            white-space: nowrap;
         }
-        button.primary:hover {
-            background-color: #1e40af;
+
+        .search-btn:hover {
+            background: var(--primary-hover);
         }
-        .history {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 24px;
-            align-items: center;
-        }
-        .history-label {
+
+        .examples {
+            margin-top: 10px;
             font-size: 13px;
-            color: #64748b;
+            color: var(--text-muted);
         }
-        .history-tag {
+
+        .example-chip {
+            display: inline-block;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 6px;
+            color: var(--primary);
+            cursor: pointer;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+
+        .example-chip:hover {
             background: #e2e8f0;
-            color: #334155;
+        }
+
+        .toolbar {
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .status-badge {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .demo-warning {
+            background: #fef3c7;
+            color: #92400e;
             padding: 4px 10px;
             border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sort-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 8px;
             font-size: 13px;
             cursor: pointer;
-            border: none;
+            color: var(--text-main);
         }
-        .history-tag:hover {
-            background: #cbd5e1;
+
+        .sort-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .card {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 18px;
+
+        .results-list {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            background: #f8fafc;
+            gap: 10px;
         }
-        .card-title {
+
+        .offer-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1.4fr 1.6fr 1fr auto;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .offer-card.best-offer {
+            background: var(--best-bg);
+            border-color: var(--best-border);
+        }
+
+        .store-name {
             font-weight: 700;
-            font-size: 18px;
-            margin-bottom: 6px;
-            color: #0f172a;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .card-desc {
-            font-size: 13px;
-            color: #64748b;
-            margin-bottom: 16px;
-        }
-        .card a {
-            display: block;
-            text-align: center;
-            background: #ffffff;
-            color: #1d4ed8;
-            border: 1px solid #1d4ed8;
-            padding: 10px;
-            border-radius: 8px;
-            text-decoration: none;
+
+        .best-tag {
+            font-size: 11px;
+            background: var(--best-border);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-weight: 600;
+        }
+
+        .part-info {
             font-size: 14px;
-            transition: all 0.2s;
         }
-        .card a:hover {
-            background: #1d4ed8;
-            color: #ffffff;
+
+        .part-brand {
+            font-weight: 600;
+            color: var(--text-main);
         }
-        .footer {
-            margin-top: 30px;
-            text-align: center;
+
+        .part-title {
+            color: var(--text-muted);
             font-size: 13px;
-            color: #94a3b8;
         }
-        .footer a {
-            color: #1d4ed8;
+
+        .delivery-info {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .price-action {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .price {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .best-offer .price {
+            color: var(--best-text);
+        }
+
+        .buy-link {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #f1f5f9;
+            color: var(--text-main);
             text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 8px;
         }
-        @media (max-width: 500px) {
-            .search-box { flex-direction: column; }
-            button.primary { width: 100%; }
+
+        .buy-link:hover {
+            background: #e2e8f0;
+        }
+
+        .best-offer .buy-link {
+            background: var(--best-border);
+            color: white;
+        }
+
+        .ad-banner {
+            margin-top: 28px;
+            padding: 16px;
+            background: #ffffff;
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        @media (max-width: 640px) {
+            .search-form {
+                flex-direction: column;
+            }
+            .offer-card {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .part-info {
+                grid-column: 1 / -1;
+            }
+            .price-action {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                grid-column: 1 / -1;
+                border-top: 1px solid var(--border);
+                padding-top: 10px;
+                margin-top: 4px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Поиск запчастей по артикулу</h1>
-    <div class="subtitle">Сравните цены и сроки доставки в магазинах и на маркетплейсах в один клик</div>
-
-    <div class="search-box">
-        <input type="text" id="partInput" placeholder="Например: 480-1012010" onkeypress="if(event.key==='Enter') searchPart()">
-        <button class="primary" onclick="searchPart()">Найти цены</button>
-    </div>
-
-    <div class="history" id="historyBox" style="display: none;">
-        <span class="history-label">Недавние:</span>
-        <div id="historyTags" style="display: flex; gap: 6px; flex-wrap: wrap;"></div>
-    </div>
-
-    <div id="results" class="grid"></div>
-
-    <div class="footer">
-        Прототип сервиса подбора запчастей. <a href="https://t.me" target="_blank">Нашли ошибку или есть идея? Напишите автору</a>
-    </div>
-</div>
-
-<script>
-    const stores = [
-        { name: "Autodoc (Автодок)", desc: "Крупный автомагазин, точные сроки", url: code => `https://autodoc.ru{code}` },
-        { name: "Emex (Емекс)", desc: "Большой выбор аналогов и оптовиков", url: code => `https://emex.ru{code}` },
-        { name: "Exist (Экзист)", desc: "Проверенные поставщики и каталоги", url: code => `https://exist.ru{code}` },
-        { name: "ZZap (ЗетЗап)", desc: "Агрегатор цен от мелких продавцов", url: code => `https://zzap.ru{code}` },
-        { name: "Ozon", desc: "Быстрая доставка в пункт выдачи", url: code => `https://ozon.ru{code}` },
-        { name: "Яндекс Маркет", desc: "Сравнение предложений и кешбэк", url: code => `https://yandex.ru{code}` }
-    ];
-
-    function renderHistory() {
-        const history = JSON.parse(localStorage.getItem('partHistory') || '[]');
-        const box = document.getElementById('historyBox');
-        const tags = document.getElementById('historyTags');
-        if (history.length === 0) {
-            box.style.display = 'none';
-            return;
-        }
-        box.style.display = 'flex';
-        tags.innerHTML = history.map(item => 
-            `<button class="history-tag" onclick="selectHistory('${item}')">${item}</button>`
-        ).join('');
-    }
-
-    function selectHistory(code) {
-        document.getElementById('partInput').value = code;
-        searchPart();
-    }
-
-    function searchPart() {
-        const rawInput = document.getElementById('partInput').value.trim().toUpperCase();
-        if (!rawInput) return;
-
-        // Очищаем артикул от пробелов и дефисов для корректного поиска в магазинах
-        const cleanCode = rawInput.replace(/[^A-Z0-9А-Я]/g, '');
-
-        // Сохраняем в историю
-        let history = JSON.parse(localStorage.getItem('partHistory') || '[]');
-        history = [rawInput, ...history.filter(i => i !== rawInput)].slice(0, 5);
-        localStorage.setItem('partHistory', JSON.stringify(history));
-        renderHistory();
-
-        // Генерируем карточки магазинов
-        const resultsDiv = document.getElementById('results');
-        resultsDiv.innerHTML = stores.map(store => `
-            <div class="card">
-                <div>
-                    <div class="card-title">${store.name}</div>
-                    <div class="card-desc">${store.desc}</div>
-                </div>
-                <a href="${store.url(cleanCode)}" target="_blank">Смотреть цены на ${rawInput} →</a>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <line x1="12" y1="12" x2="18.36" y2="5.64"></line>
+                </svg>
             </div>
-        `).join('');
-    }
+            <span>PartsRadar</span>
+        </div>
+        <p class="tagline">Находим самые выгодные цены и сроки доставки автозапчастей по артикулу</p>
+    </header>
 
-    // Загружаем историю при открытии страницы
-    renderHistory();
-</script>
+    <div class="search-card">
+        <form class="search-form" id="searchForm">
+            <input 
+                type="text" 
+                id="articleInput" 
+                class="search-input" 
+                placeholder="Введите артикул (например, OC90 или 15208AA100)" 
+                required
+            >
+            <button type="submit" class="search-btn">Найти цены</button>
+        </form>
+        <div class="examples">
+            Примеры для проверки: 
+            <span class="example-chip" onclick="quickSearch('OC90')">OC90</span>
+            <span class="example-chip" onclick="quickSearch('2630035505')">2630035505</span>
+            <span class="example-chip" onclick="quickSearch('4806009030')">4806009030</span>
+        </div>
+    </div>
 
-</body>
-</html>
+    <div class="loader" id="loader">Сканируем магазины и маркетплейсы...</div>
+
+    <div class="toolbar" id="toolbar">
+        <div class="status-badge" id="statusText">Найдено предложений: 0</div>
+        <div class="sort-controls">
+            <button class="sort-btn active" id="sortPriceBtn" onclick="sortOffers('price')">Сначала дешевле</button>
+            <button class="sort-btn" id="sortDaysBtn" onclick="sortOffers('days')">Быстрее доставка</button>
+        </div>
+    </div>
+
+    <div class="results-list" id="resultsList"></div>
+
+    <div class="ad-banner" id="yandex_rtb_placeholder">
